@@ -18,8 +18,8 @@ def yandex_geocoder(address: str):
     res = requests.get(URL.replace("[address]", address, 1))
     coords = res.json()['response']['GeoObjectCollection'][
         'featureMember'][-1]['GeoObject']['Point']['pos']
-    coords = (float(item) for item in coords.split())
-    return coords
+    coords = [float(item) for item in coords.split()]
+    return (coords[1], coords[0])
 
 
 # Uses the Nominatim API of the geopy library in order to
