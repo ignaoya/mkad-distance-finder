@@ -3,7 +3,7 @@ from typing import Dict, Tuple, Union
 from flask import Blueprint, request
 from flask_restful import Api, Resource
 from marshmallow import Schema, fields
-from geo_functions import yandex_geocoder, get_distance, geopy_geocoder
+from geo_functions import yandex_geocoder, get_distance, geopy_geocoder, is_inside_mkad
 from exceptions import YandexValueError, YandexValidationError
 
 
@@ -53,9 +53,14 @@ class DistanceFinder(Resource):
             return {"error": "Could not parse address provided"}, 400
 
         try:
-            distance = get_distance(coords)
-            logging.info("Distance from MKAD to " + address + ": " + str(distance))
-            return {"distance_km": distance}, 200
+            is_inside = is_inside_mkad(coords)
+            if is_inside:
+                logging.info(address + " is inside of the MKAD.")
+                return {"message": "Given address is inside the MKAD."}, 200
+            else:
+                distance = get_distance(coords)
+                logging.info("Distance from MKAD to " + address + ": " + str(distance))
+                return {"distance_km": distance}, 200
         except ValueError as error:
             logging.error(error)
             return {"error": "Server error"}, 500

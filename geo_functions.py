@@ -3,6 +3,7 @@ import requests
 from typing import Tuple
 from geopy.distance import distance
 from geopy.geocoders import Nominatim
+from shapely.geometry import Point, Polygon
 from mkad_coords import mkad_coords
 from exceptions import YandexValueError, YandexValidationError
 
@@ -40,11 +41,29 @@ def geopy_geocoder(address: str) -> Tuple[float, float]:
     return (coordinates.latitude, coordinates.longitude)
 
 
+def is_inside_mkad(coordinates: Tuple[float, float]) -> bool:
+    """ 
+    Returns True if the given coordinates are inside the MKAD,
+    false otherwise.
+
+    The function uses the shapely library's Point and Polygon 
+    classes based on the given coordinates in order to use the
+    Point.within() function to test against the Polygon formed
+    from the MKAD kilometer coordinates.
+    """
+    point = Point(coordinates)
+    mkad = [(item[2], item[1]) for item in mkad_coords]
+    mkad_polygon = Polygon(mkad)
+
+    return point.within(mkad_polygon)
+
+
 # Simple function that uses the geopy library to measure the shortest
 # distance to the MKAD by comparing the distances from the given coords
 # to each of the kilometer points of the Ring Road.
 def get_distance(coordinates: Tuple[float, float]) -> int:
-    shortest_distance = distance(coordinates, (mkad_coords[0][2], mkad_coords[0][1])).km
+    shortest_distance = distance(coordinates, (mkad_coords[0][2],
+                                               mkad_coords[0][1])).km
 
     for km in mkad_coords[1:]:
         temp = distance(coordinates, (km[2], km[1])).km
