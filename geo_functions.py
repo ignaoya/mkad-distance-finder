@@ -4,6 +4,7 @@ from typing import Tuple
 from geopy.distance import distance
 from geopy.geocoders import Nominatim
 from mkad_coords import mkad_coords
+from exceptions import YandexValueError, YandexValidationError
 
 YANDEX_KEY = os.getenv("YANDEX_API_KEY")
 URL = "https://geocode-maps.yandex.ru/1.x/" \
@@ -17,10 +18,17 @@ def yandex_geocoder(address: str) -> Tuple[float, float]:
     # call the yandex Api using the requests library
     # and save the response to 'res'
     result = requests.get(URL.replace("[address]", address, 1))
-    coordinates = result.json()['response']['GeoObjectCollection'][
-        'featureMember'][-1]['GeoObject']['Point']['pos']
-    coordinates = [float(item) for item in coordinates.split()]
-    return (coordinates[1], coordinates[0])
+    print(result.status_code)
+
+    if result.status_code == 400:
+        raise YandexValueError
+    elif result.status_code == 403:
+        raise YandexValidationError
+    else:
+        coordinates = result.json()['response']['GeoObjectCollection'][
+            'featureMember'][-1]['GeoObject']['Point']['pos']
+        coordinates = [float(item) for item in coordinates.split()]
+        return (coordinates[1], coordinates[0])
 
 
 # Uses the Nominatim API of the geopy library in order to

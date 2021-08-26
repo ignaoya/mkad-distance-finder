@@ -4,6 +4,7 @@ from flask import Blueprint, request
 from flask_restful import Api, Resource
 from marshmallow import Schema, fields
 from geo_functions import yandex_geocoder, get_distance, geopy_geocoder
+from exceptions import YandexValueError, YandexValidationError
 
 
 logging.basicConfig(level=logging.INFO, filename='mkad.log', filemode='a')
@@ -38,16 +39,25 @@ class DistanceFinder(Resource):
             # [yandex_geocoder] can be switched to [geopy_geocoder] in case
             # of server failure or other issues with yandex.
             coords = yandex_geocoder(address)
-        except:
-            logging.error("Could not parse address provided")
+        except YandexValueError as error:
+            logging.error(error.message)
+            return {"error": error.message}, 400
+        except YandexValidationError as error:
+            logging.error(error.message)
+            return {"error": error.message}, 400
+        except IndexError as error:
+            logging.error(error)
+            return {"error": "Could not parse address provided"}, 400
+        except KeyError as error:
+            logging.error(error)
             return {"error": "Could not parse address provided"}, 400
 
         try:
             distance = get_distance(coords)
             logging.info("Distance from MKAD to " + address + ": " + str(distance))
             return {"distance_km": distance}, 200
-        except:
-            logging.error("Server error")
+        except ValueError as error:
+            logging.error(error)
             return {"error": "Server error"}, 500
 
 
