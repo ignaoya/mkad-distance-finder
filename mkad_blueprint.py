@@ -3,8 +3,8 @@ from typing import Dict, Tuple, Union
 from flask import Blueprint, request
 from flask_restful import Api, Resource
 from marshmallow import Schema, fields
-from geo_functions import yandex_geocoder, get_distance, geopy_geocoder, is_inside_mkad
-from exceptions import YandexValueError, YandexValidationError
+from geo_functions import default_geocoder, is_inside_mkad, get_distance
+from exceptions import GeocoderError
 
 
 logging.basicConfig(level=logging.INFO, filename='mkad.log', filemode='a')
@@ -27,22 +27,16 @@ schema = QuerySchema()
 class DistanceFinder(Resource):
 
     def get(self) -> Tuple[Dict[str, Union[str, int]], int]:
-        errors = schema.validate(request.args)
-        if errors:
-            logging.error(str(errors))
-            return {"error": str(errors)}, 400
+        input_errors = schema.validate(request.args)
+        if input_errors:
+            logging.error(str(input_errors))
+            return {"error": str(input_errors)}, 400
         else:
             address = request.args.get('address')
 
         try:
-            # Attempt to convert address to coordinates using the yandex api.
-            # [yandex_geocoder] can be switched to [geopy_geocoder] in case
-            # of server failure or other issues with yandex.
-            coords = yandex_geocoder(address)
-        except YandexValueError as error:
-            logging.error(error.message)
-            return {"error": error.message}, 400
-        except YandexValidationError as error:
+            coords = default_geocoder(address)
+        except GeocoderError as error:
             logging.error(error.message)
             return {"error": error.message}, 400
         except IndexError as error:
@@ -59,11 +53,11 @@ class DistanceFinder(Resource):
                 return {"message": "Given address is inside the MKAD."}, 200
             else:
                 distance = get_distance(coords)
-                logging.info("Distance from MKAD to " + address + ": " + str(distance))
+                logging.info("Distance to " + address + ": " + str(distance))
                 return {"distance_km": distance}, 200
         except ValueError as error:
             logging.error(error)
-            return {"error": "Server error"}, 500
+            return {"error": "An error occurred, try again later!"}, 400
 
 
 api.add_resource(DistanceFinder, '/mkad')

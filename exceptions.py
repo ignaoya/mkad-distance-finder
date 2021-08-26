@@ -1,4 +1,9 @@
-class YandexError(Exception):
+class GeocoderError(Exception):
+    """Base class for geocoder conversion exceptions."""
+    pass
+
+
+class YandexError(GeocoderError):
     """Base class for other Yandex API related exceptions."""
     pass
 
@@ -8,6 +13,7 @@ class YandexValueError(YandexError):
     def __init__(self):
         self.message = "Address could not be parsed due to invalid value."
         super().__init__(self.message)
+
 
 class YandexValidationError(YandexError):
     """Exception used when the request uses an invalid API key."""
