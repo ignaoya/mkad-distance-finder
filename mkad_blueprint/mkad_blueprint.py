@@ -3,8 +3,8 @@ from typing import Dict, Tuple, Union
 from flask import Blueprint, request
 from flask_restful import Api, Resource
 from marshmallow import Schema, fields
-from geo_functions import default_geocoder, is_inside_mkad, get_distance
-from exceptions import GeocoderError
+from .geo_functions import default_geocoder, is_inside_mkad, get_distance
+from .exceptions import GeocoderError
 
 
 logging.basicConfig(level=logging.INFO, filename='mkad.log', filemode='a')

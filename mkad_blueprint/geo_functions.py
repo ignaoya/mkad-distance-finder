@@ -5,8 +5,8 @@ from geopy.distance import distance
 from geopy.geocoders import Nominatim
 from geopy.exc import ConfigurationError, GeocoderServiceError, GeopyError
 from shapely.geometry import Point, Polygon
-from mkad_coords import mkad_coords
-from exceptions import GeocoderError,\
+from .mkad_coords import mkad_coords
+from .exceptions import GeocoderError,\
                        YandexError,\
                        YandexValueError,\
                        YandexValidationError
