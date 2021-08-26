@@ -36,11 +36,11 @@ def geopy_geocoder(address: str) -> Tuple[float, float]:
 # distance to the MKAD by comparing the distances from the given coords
 # to each of the kilometer points of the Ring Road.
 def get_distance(coordinates: Tuple[float, float]) -> int:
-    distance = distance(coordinates, (mkad_coords[0][2], mkad_coords[0][1])).km
+    shortest_distance = distance(coordinates, (mkad_coords[0][2], mkad_coords[0][1])).km
 
     for km in mkad_coords[1:]:
         temp = distance(coordinates, (km[2], km[1])).km
-        if temp < distance:
-            distance = temp
+        if temp < shortest_distance:
+            shortest_distance = temp
 
-    return int(distance)
+    return int(shortest_distance)
