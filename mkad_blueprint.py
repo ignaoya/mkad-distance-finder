@@ -1,3 +1,4 @@
+from typing import Dict, Union
 from flask import Blueprint, request
 from flask_restful import Api, Resource
 from marshmallow import Schema, fields
@@ -20,13 +21,13 @@ schema = QuerySchema()
 # restricting the use of the api to GET requests.
 class DistanceFinder(Resource):
 
-    def get(self):
+    def get(self) -> Dict[str, Union[str, int]], int:
         errors = schema.validate(request.args)
         if errors:
             return {"error": str(errors)}, 400
 
         try:
-            coords = yandex_geocoder(str(request.args.get('address')))
+            coords = geopy_geocoder(str(request.args.get('address')))
         except:
             return {"error": "Could not parse address provided"}, 400
 

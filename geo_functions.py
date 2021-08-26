@@ -1,5 +1,6 @@
 import os
 import requests
+from typing import Tuple
 from geopy.distance import distance
 from geopy.geocoders import Nominatim
 from mkad_coords import mkad_coords
@@ -12,34 +13,34 @@ URL = URL.replace("[key]", YANDEX_KEY, 1)
 
 # Makes a request to the Yandex API in order to
 # convert the given address to a pair of latitude longitude coordinates.
-def yandex_geocoder(address: str):
+def yandex_geocoder(address: str) -> Tuple[float, float]:
     # call the yandex Api using the requests library
     # and save the response to 'res'
-    res = requests.get(URL.replace("[address]", address, 1))
-    coords = res.json()['response']['GeoObjectCollection'][
+    result = requests.get(URL.replace("[address]", address, 1))
+    coordinates = result.json()['response']['GeoObjectCollection'][
         'featureMember'][-1]['GeoObject']['Point']['pos']
-    coords = [float(item) for item in coords.split()]
-    return (coords[1], coords[0])
+    coordinates = [float(item) for item in coordinates.split()]
+    return (coordinates[1], coordinates[0])
 
 
 # Uses the Nominatim API of the geopy library in order to
 # convert the given address to a pair of latitude-longitude coordinates.
 # Can be used as a backup in case Yandex server is down or not working.
-def geopy_geocoder(address: str):
+def geopy_geocoder(address: str) -> Tuple[float, float]:
     geolocator = Nominatim(user_agent="mkad")
-    location = geolocator.geocode(address)
-    return (location.latitude, location.longitude)
+    coordinates = geolocator.geocode(address)
+    return (coordinates.latitude, coordinates.longitude)
 
 
 # Simple function that uses the geopy library to measure the shortest
 # distance to the MKAD by comparing the distances from the given coords
 # to each of the kilometer points of the Ring Road.
-def get_distance(coords):
-    shortest = distance(coords, (mkad_coords[0][2], mkad_coords[0][1])).miles
+def get_distance(coordinates: Tuple[float, float]) -> int:
+    distance = distance(coordinates, (mkad_coords[0][2], mkad_coords[0][1])).km
 
     for km in mkad_coords[1:]:
-        temp = distance(coords, (km[2], km[1])).miles
-        if temp < shortest:
-            shortest = temp
+        temp = distance(coordinates, (km[2], km[1])).km
+        if temp < distance:
+            distance = temp
 
-    return int(shortest)
+    return int(distance)
