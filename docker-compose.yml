@@ -1,0 +1,10 @@
+version: '3'
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    environment:
+      - "YANDEX_API_KEY=${YANDEX_API_KEY}"
+    ports:
+      - "5000:5000"

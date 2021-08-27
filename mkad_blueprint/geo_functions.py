@@ -6,15 +6,18 @@ from geopy.geocoders import Nominatim
 from geopy.exc import ConfigurationError, GeocoderServiceError, GeopyError
 from shapely.geometry import Point, Polygon
 from .mkad_coords import mkad_coords
-from .exceptions import GeocoderError,\
-                       YandexError,\
-                       YandexValueError,\
-                       YandexValidationError
+from .exceptions import (
+    GeocoderError,
+    YandexError,
+    YandexValueError,
+    YandexValidationError
+)
 
 YANDEX_KEY = os.getenv("YANDEX_API_KEY")
 URL = "https://geocode-maps.yandex.ru/1.x/" \
       "?apikey=[key]&geocode=[address]&format=json"
-URL = URL.replace("[key]", YANDEX_KEY, 1)
+if YANDEX_KEY:
+    URL = URL.replace("[key]", YANDEX_KEY, 1)
 
 
 def default_geocoder(address: str) -> Tuple[float, float]:
