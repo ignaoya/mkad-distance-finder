@@ -41,7 +41,6 @@ def yandex_geocoder(address: str) -> Tuple[float, float]:
     convert the given address to a pair of latitude longitude coordinates.
     """
     result = requests.get(URL.replace("[address]", address, 1))
-    print(result.status_code)
 
     if result.status_code == 400:
         raise YandexValueError
@@ -71,7 +70,9 @@ def geopy_geocoder(address: str) -> Tuple[float, float]:
         coordinates = geolocator.geocode(address)
         return (coordinates.latitude, coordinates.longitude)
     except GeocoderServiceError:
-        raise
+        raise GeopyError
+    except AttributeError:
+        raise GeopyError
 
 
 def is_inside_mkad(coordinates: Tuple[float, float]) -> bool:

@@ -36,9 +36,9 @@ class DistanceFinder(Resource):
 
         try:
             coords = default_geocoder(address)
-        except GeocoderError as error:
-            logging.error(error.message)
-            return {"error": error.message}, 400
+        except GeocoderError:
+            logging.error("Geocoder parser error")
+            return {"error": "Could not parse address provided"}, 400
         except IndexError as error:
             logging.error(error)
             return {"error": "Could not parse address provided"}, 400
