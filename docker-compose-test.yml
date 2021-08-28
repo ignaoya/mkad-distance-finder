@@ -3,13 +3,8 @@ services:
   app:
     build:
       context: .
-      dockerfile: Dockerfile
+      dockerfile: Dockerfile_Test
     environment:
       - "YANDEX_API_KEY=${YANDEX_API_KEY}"
     ports:
       - "5000:5000"
-    volumes:
-      - data:/logs
-
-volumes:
-  data:

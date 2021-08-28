@@ -10,7 +10,6 @@ RUN apt-get update && \
     pip install --upgrade pip && \
     pip install -r requirements.txt 
 
-# Run Flask App
-EXPOSE 5000
-CMD ["python", "app.py"]
+# Run Tests
+CMD ["python", "tests.py"]
 

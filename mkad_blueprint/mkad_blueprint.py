@@ -7,7 +7,7 @@ from .geo_functions import default_geocoder, is_inside_mkad, get_distance
 from .exceptions import GeocoderError
 
 
-logging.basicConfig(level=logging.INFO, filename='mkad.log', filemode='a')
+logging.basicConfig(level=logging.INFO, filename='logs/mkad.log', filemode='a')
 
 
 # marshmallow Schema is used in order to validate and
