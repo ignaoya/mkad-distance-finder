@@ -10,10 +10,13 @@ from .exceptions import GeocoderError
 logging.basicConfig(level=logging.INFO, filename='logs/mkad.log', filemode='a')
 
 
-# marshmallow Schema is used in order to validate and
-# filter input data in order to ensure App security.
-# Expected request format is: '/mkad?address=[example address]'
 class QuerySchema(Schema):
+    """
+    The marshmallow Schema is used in order to validate and
+    filter input data in order to ensure App security.
+
+    Expected request format is: '/mkad?address=[example address]'
+    """
     address = fields.Str(required=True)
 
 
@@ -22,11 +25,15 @@ api = Api(mkad_bp)
 schema = QuerySchema()
 
 
-# DistanceFinder only has a get() method implemented,
-# restricting the use of the api to GET requests.
 class DistanceFinder(Resource):
+    """
+    DistanceFinder only has a get() method implemented,
+    restricting the use of the api to GET requests.
+    """
 
     def get(self) -> Tuple[Dict[str, Union[str, int]], int]:
+
+        # Perform argument validation with our schema
         input_errors = schema.validate(request.args)
         if input_errors:
             logging.error(str(input_errors))
@@ -34,6 +41,7 @@ class DistanceFinder(Resource):
         else:
             address = request.args.get('address')
 
+        # Convert given address to coordinates
         try:
             coords = default_geocoder(address)
         except GeocoderError:
@@ -46,6 +54,8 @@ class DistanceFinder(Resource):
             logging.error(error)
             return {"error": "Could not parse address provided"}, 400
 
+        # Determine whether the coordinates are inside the MKAD and
+        # calculate distance if they are not.
         try:
             if is_inside_mkad(coords):
                 logging.info(address + " is inside of the MKAD.")

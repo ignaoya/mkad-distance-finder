@@ -10,6 +10,7 @@ from mkad_blueprint.geo_functions import (
     geopy_geocoder,
     is_inside_mkad,
     get_distance,
+    get_distance_shapely,
     get_distance_binary_search
 )
 from mkad_blueprint.exceptions import (
@@ -208,11 +209,21 @@ class GetDistanceTests(unittest.TestCase):
         self.assertTrue(type(result) == int)
 
 
+class GetDistanceShapelyTests(unittest.TestCase):
+    """Tests for get_distance_shapely()"""
+
+    def test_return_value(self):
+        coordinates = (55, 37)
+        result = get_distance_shapely(coordinates)
+        self.assertTrue(result > 0)
+        self.assertTrue(type(result) == int)
+
+
 class GetDistanceBinarySearchTests(unittest.TestCase):
     """Tests for get_distance_binary_search()"""
 
     def test_return_value(self):
-        coordinates = (55, 37)
+        coordinates = (40, 30)
         binary_search_result = get_distance_binary_search(coordinates)
         brute_force_result = get_distance(coordinates)
         self.assertEqual(binary_search_result, brute_force_result)
