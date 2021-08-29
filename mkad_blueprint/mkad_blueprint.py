@@ -47,8 +47,7 @@ class DistanceFinder(Resource):
             return {"error": "Could not parse address provided"}, 400
 
         try:
-            is_inside = is_inside_mkad(coords)
-            if is_inside:
+            if is_inside_mkad(coords):
                 logging.info(address + " is inside of the MKAD.")
                 return {"message": "Given address is inside the MKAD."}, 200
             else:
